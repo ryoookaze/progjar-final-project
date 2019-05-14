@@ -29,12 +29,12 @@ class Cliente():
 			try:
 				data = self.sock.recv(1024)
 				if data:
-					print(pickle.loads(data))
+					print(pickle.loads(str(data)))
 			except:
 				pass
 
 	def send_msg(self, msg):
-		self.sock.send(pickle.dumps(str(IPclient)+" says "+msg))
+		self.sock.send(pickle.dumps(str(IPclient)+" says "+str(msg)))
 
 
 c = Cliente()
