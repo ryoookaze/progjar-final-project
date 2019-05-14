@@ -4,24 +4,23 @@ import sys
 import pickle
 
 class Server():
-	def __init__(self, host="0.0.0.0", port=4000):
+	def __init__(self, host="localhost", port=4000):
 
-		self.client = []
+		self.clients = []
 
 		self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		self.sock.bind((str(host), int(port)))
 		self.sock.listen(10)
 		self.sock.setblocking(False)
-        
 
-		accept = threading.Thread(target=self.acceptCon)
-		process = threading.Thread(target=self.processCon)
+		aceptar = threading.Thread(target=self.aceptarCon)
+		procesar = threading.Thread(target=self.procesarCon)
 		
-		accept.daemon = True
-		accept.start()
+		aceptar.daemon = True
+		aceptar.start()
 
-		process.daemon = True
-		process.start()
+		procesar.daemon = True
+		procesar.start()
 
 		while True:
 			msg = input('->')
@@ -32,27 +31,27 @@ class Server():
 				pass
 
 
-	def msg_to_all(self, msg, cliente):
-		for c in self.client:
+	def msg_to_all(self, msg, client):
+		for c in self.clients:
 			try:
 				if c != client:
 					c.send(msg)
 			except:
-				self.client.remove(c)
+				self.clients.remove(c)
 
-	def acceptCon(self):
+	def aceptarCon(self):
 		while True:
 			try:
 				conn, addr = self.sock.accept()
 				conn.setblocking(False)
-				self.clientes.append(conn)
+				self.clients.append(conn)
 			except:
 				pass
 
-	def processCon(self):
+	def procesarCon(self):
 		while True:
-			if len(self.client) > 0:
-				for c in self.client:
+			if len(self.clients) > 0:
+				for c in self.clients:
 					try:
 						data = c.recv(1024)
 						if data:
