@@ -3,6 +3,7 @@ import threading
 import sys
 import pickle
 
+IPclient=sys.argv[1]
 class Cliente():
 	"""docstring for Cliente"""
 	def __init__(self, host="localhost", port=4000):
@@ -33,7 +34,7 @@ class Cliente():
 				pass
 
 	def send_msg(self, msg):
-		self.sock.send(pickle.dumps(msg))
+		self.sock.send(pickle.dumps(str(IPclient)+" says "+msg))
 
 
 c = Cliente()
