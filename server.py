@@ -43,6 +43,7 @@ class Server():
 		while True:
 			try:
 				conn, addr = self.sock.accept()
+				print("%s has connected", addr)
 				conn.setblocking(False)
 				self.clients.append(conn)
 			except:
