@@ -29,7 +29,7 @@ class Cliente():
 			try:
 				data = self.sock.recv(1024)
 				if data:
-					print(pickle.loads(str(data)))
+					print(pickle.loads(data))
 			except:
 				pass
 
