@@ -39,6 +39,11 @@ class Chat:
 				username = self.sessions[sessionid]['username']
 				print "{} {}" . format(command, username)
 				return self.logout(sessionid)
+			elif(command=='creategroup'):
+				sessionid = j[1]
+				group_name = j[2]
+				print"{} {}" . format(command, username)
+				return self.creategroup(group_name, sessionid)
 			else:
 				return {'status': 'ERROR', 'message': '**Protocol Tidak Benar'}
 		except IndexError:
@@ -90,7 +95,7 @@ class Chat:
 			
 		return {'status': 'OK', 'messages': msgs}
 	def logout(self,sessionid,username):
-		self.sessions['sessionid'] = ""
+		self.sessions['sessionid'] = None
 		return "Logout Success"
 
 if __name__=="__main__":

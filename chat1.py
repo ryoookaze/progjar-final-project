@@ -36,6 +36,21 @@ class ChatClient:
                     return self.inbox()
                 elif (command=='logout'):
                     return self.logout()
+                elif(command=='creategroup'):
+                    groupname = j[1]
+                    return self.creategroup()
+                elif(command=='joingroup'):
+                    grouptoken = j[1]
+                    return self.joingroup()
+                elif(command=='leftgroup'):
+                    grouptoken = j[1]
+                    return self.leftgroup()
+                elif(command=='sendmsggroup'):
+                    grouptoken = j[1]
+                    message=""
+                    for w in j[2:]:
+                        message="{} {}" . format(message,w)
+                    return self.sendmsggroup(grouptoken,message)
                 else:
 		        return "*Maaf, command tidak benar"
 	    except IndexError:
