@@ -1,6 +1,10 @@
 import socket
 import os
+import select
 import json
+import sys
+import pickle
+import threading
 
 TARGET_IP = "127.0.0.1"
 TARGET_PORT = 8889
@@ -12,6 +16,12 @@ class ChatClient:
         self.server_address = (TARGET_IP,TARGET_PORT)
         self.sock.connect(self.server_address)
         self.tokenid=""
+
+        msg_receive = threading.thread(target=self.msg_receive)
+
+        msg_receive.daemon = True
+        msg_receive.start()
+
     def proses(self,cmdline):
 	j=cmdline.split(" ")
 	try:
@@ -31,6 +41,8 @@ class ChatClient:
             elif(command=='logout'):
                 tokenid = ''
                 return self.logout()
+            elif(command=='groupchat'):
+                return self.groupmessage()
 	    else:
 		return "*Maaf, command tidak benar"
 	except IndexError:
@@ -75,6 +87,19 @@ class ChatClient:
             return "{}" . format(json.dumps(result['messages']))
         else:
             return "Error, {}" . format(result['message'])
+    def groupmessage(self,username):
+        if(self.tokenid==""):
+            return "Error, not authorized"
+        sys.stdout.write("> {}") . format(username)
+        sys.stdout.flush()
+        while True:
+            while True:
+			try:
+				data = self.sock.recv(1024)
+				if data:
+					print(pickle.loads(data))
+			except:
+				pass
 
 
 
