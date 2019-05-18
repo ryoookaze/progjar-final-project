@@ -17,38 +17,29 @@ class ChatClient:
         self.sock.connect(self.server_address)
         self.tokenid=""
 
-        groupmessage = threading.Thread(target=self.groupmessage)
-
-        groupmessage.daemon = True
-        groupmessage.start()
-
     def proses(self,cmdline):
-	j=cmdline.split(" ")
-	try:
-	    command=j[0].strip()
-	    if (command=='auth'):
-            username=j[1].strip()
-            password=j[2].strip()
-            return self.login(username,password)
-	    elif (command=='send'):
-            sessionid = j[1]
-            usernameto = j[1].strip()
+	    j=cmdline.split(" ")
+            try:
+                command=j[0].strip()
+                if (command=='auth'):
+                    username=j[1].strip()
+                    password=j[2].strip()
+                    return self.login(username,password)
+                elif (command=='send'):
+                    sessionid = j[1]
+                    usernameto = j[1].strip()
                     message=""
                     for w in j[2:]:
-                    message="{} {}" . format(message,w)
-            return self.sendmessage(usernameto,message)
-            elif (command=='inbox'):
-                return self.inbox()
-            elif(command=='logout'):
-                
-                return self.logout()
-            elif(command=='groupchat'):
-                username = j[1].strip()
-                return self.groupmessage(username)
-	    else:
-		return "*Maaf, command tidak benar"
-	except IndexError:
-	    return "-Maaf, command tidak benar"
+                        message="{} {}" . format(message,w)
+                    return self.sendmessage(usernameto,message)
+                elif (command=='inbox'):
+                    return self.inbox()
+                elif (command=='logout'):
+                    return self.logout()
+                else:
+		        return "*Maaf, command tidak benar"
+	    except IndexError:
+	        return "-Maaf, command tidak benar"
     def sendstring(self,string):
         try:
             self.sock.sendall(string)
@@ -70,7 +61,15 @@ class ChatClient:
         else:
             return "Error, {}" . format(result['message'])
     def logout(self, username):
-        return "username {} logged out" . format(username)
+        if(self.tokenid==""):
+            return"Error, not authorized"
+        string = "logout {} \r\n" . format(self.tokenid)
+        result = self.sendstring(string)
+        if (result['status'] == 'OK'):
+			self.tokenid = ""
+			self.username = ""
+        else:
+            return"Unexpected error ?"
     def sendmessage(self,usernameto="xxx",message="xxx"):
         if (self.tokenid==""):
             return "Error, not authorized"
@@ -89,29 +88,9 @@ class ChatClient:
             return "{}" . format(json.dumps(result['messages']))
         else:
             return "Error, {}" . format(result['message'])
-    
-    def groupmessage(self,username):
-        if(self.tokenid==""):
-            return "Error, not authorized"
-        while True:
-            msg = input('->')
-            if (msg != ' out'):
-                self.sendgroupchat(msg)
-        while True:
-			try:
-				data = self.sock.recv(1024)
-				if data:
-					print(pickle.loads(data))
-			except:
-				pass
-    def sendgroupchat(self,msg):
-        self.sock.send(pickle.dumps(msg))
-
-
 
 if __name__=="__main__":
     cc = ChatClient()
     while True:
         cmdline = raw_input("Command {}:" . format(cc.tokenid))
         print cc.proses(cmdline)
-

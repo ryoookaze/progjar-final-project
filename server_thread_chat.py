@@ -30,15 +30,7 @@ class Server(threading.Thread):
 		self.the_clients = []
 		self.my_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		threading.Thread.__init__(self)
-
-	def msg_to_all(self, msg, client):
-		for c in self.clients:
-			try:
-				if c != client:
-					c.send(msg)
-			except:
-				self.clients.remove(c)
-
+		
 	def run(self):
 		self.my_socket.bind(('0.0.0.0',8889))
 		self.my_socket.listen(1)

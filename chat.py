@@ -35,8 +35,10 @@ class Chat:
                                 print "inbox {}" . format(sessionid)
                                 return self.get_inbox(username)
 			elif(command=='logout'):
-				sessionid = ''
-				return proses
+				sessionid = j[1]
+				username = self.sessions[sessionid]['username']
+				print "{} {}" . format(command, username)
+				return self.logout(sessionid)
 			else:
 				return {'status': 'ERROR', 'message': '**Protocol Tidak Benar'}
 		except IndexError:
@@ -87,7 +89,9 @@ class Chat:
 				msgs[users].append(s_fr['incoming'][users].get_nowait())
 			
 		return {'status': 'OK', 'messages': msgs}
-
+	def logout(self,sessionid,username):
+		self.sessions['sessionid'] = ""
+		return "Logout Success"
 
 if __name__=="__main__":
 	j = Chat()
