@@ -42,7 +42,7 @@ class ChatClient:
                 tokenid = ''
                 return self.logout()
             elif(command=='groupchat'):
-                username = j[3].strip()
+                username = j[1].strip()
                 return self.groupmessage(username)
 	    else:
 		return "*Maaf, command tidak benar"
@@ -88,8 +88,7 @@ class ChatClient:
             return "{}" . format(json.dumps(result['messages']))
         else:
             return "Error, {}" . format(result['message'])
-    def sendgroupchat(self,msg):
-        self.sock.send(pickle.dumps(msg))
+    
     def groupmessage(self,username):
         if(self.tokenid==""):
             return "Error, not authorized"
@@ -104,6 +103,8 @@ class ChatClient:
 					print(pickle.loads(data))
 			except:
 				pass
+    def sendgroupchat(self,msg):
+        self.sock.send(pickle.dumps(msg))
 
 
 
