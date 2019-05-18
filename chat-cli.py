@@ -17,10 +17,10 @@ class ChatClient:
         self.sock.connect(self.server_address)
         self.tokenid=""
 
-        msg_receive = threading.thread(target=self.msg_receive)
+        groupmessage = threading.Thread(target=self.groupmessage)
 
-        msg_receive.daemon = True
-        msg_receive.start()
+        groupmessage.daemon = True
+        groupmessage.start()
 
     def proses(self,cmdline):
 	j=cmdline.split(" ")
@@ -42,7 +42,8 @@ class ChatClient:
                 tokenid = ''
                 return self.logout()
             elif(command=='groupchat'):
-                return self.groupmessage()
+                username = j[3].strip()
+                return self.groupmessage(username)
 	    else:
 		return "*Maaf, command tidak benar"
 	except IndexError:
@@ -87,13 +88,16 @@ class ChatClient:
             return "{}" . format(json.dumps(result['messages']))
         else:
             return "Error, {}" . format(result['message'])
+    def sendgroupchat(self,msg):
+        self.sock.send(pickle.dumps(msg))
     def groupmessage(self,username):
         if(self.tokenid==""):
             return "Error, not authorized"
-        sys.stdout.write("> {}") . format(username)
-        sys.stdout.flush()
         while True:
-            while True:
+            msg = input('->')
+            if (msg != ' out'):
+                self.sendgroupchat(msg)
+        while True:
 			try:
 				data = self.sock.recv(1024)
 				if data:
