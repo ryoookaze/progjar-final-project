@@ -1,7 +1,7 @@
 # Pemrograman Jaringan
 Final Project Pemrograman Jaringan
 
-## User Input
+## User
 **Log In**
 `
     auth [username][password]
@@ -18,7 +18,7 @@ Final Project Pemrograman Jaringan
 `
 `
 
-## Group Chat
+## Group
 **Create Group**
 `
     create_group [groupname]
