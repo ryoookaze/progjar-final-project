@@ -52,11 +52,18 @@ class Chat:
 				group_token = j[2]
 				print "{} {}" . format(command, group_token)
 				return self.join_group(group_token, sessionid)
+
 			elif(command == 'leave_group'):
 				sessionid = j[1]
 				group_name = j[2]
 				print "{} {}" . format(command, group_name)
 				return self.leave_group(group_name, sessionid)
+
+			elif(command == 'sendmsg_group'):
+				sessionid = j[1]
+				group_name = j[2]
+				print "{} {}" . format(command, group_name)
+				return self.sendmsg_group(group_name, sessionid)
 			else:
 				return {'status': 'ERROR', 'message': '**Protocol Tidak Benar'}
 		except IndexError:
@@ -134,7 +141,11 @@ class Chat:
 			return {'status':'OK', 'message':'Group joined successfully'}
 
 		return {'status':'Err', 'message':'You already joined group'}
-
+	
+	def sendmsg_group(self, group_name, sessionid, message):
+		if group_name not in self.groups:
+			return {'message': 'No group exist'}
+		
 	def leave_group(self, group_name, sessionid):
 		username = self.sessions[sessionid]['username']
 		if(group_name not in self.groups):
