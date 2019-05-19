@@ -9,12 +9,10 @@ from chat import Chat
 
 chatserver = Chat()
 
-global proses
 class ProcessTheClient(threading.Thread):
 	def __init__(self,connection,address):
 		self.connection = connection
 		self.address = address
-		self.clients = []
 		threading.Thread.__init__(self)
 
 	def run(self):

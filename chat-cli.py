@@ -1,14 +1,10 @@
 import socket
 import os
-import select
 import json
-import sys
-import pickle
-import threading
+import datetime
 
 TARGET_IP = "127.0.0.1"
 TARGET_PORT = 8889
-
 
 class ChatClient:
     def __init__(self):
@@ -17,38 +13,46 @@ class ChatClient:
         self.sock.connect(self.server_address)
         self.tokenid=""
 
-        groupmessage = threading.Thread(target=self.groupmessage)
-
-        groupmessage.daemon = True
-        groupmessage.start()
-
     def proses(self,cmdline):
-	j=cmdline.split(" ")
-	try:
-	    command=j[0].strip()
-	    if (command=='auth'):
-            username=j[1].strip()
-            password=j[2].strip()
-            return self.login(username,password)
-	    elif (command=='send'):
-            sessionid = j[1]
-            usernameto = j[1].strip()
-                    message=""
-                    for w in j[2:]:
+        j=cmdline.strip().split(" ")
+
+        try:
+            command=j[0]
+            if (command=='auth'):
+                username=j[1]
+                password=j[2]
+                return self.login(username,password)
+
+            elif (command=='send'):
+                usernameto = j[1]
+                message=""
+                for w in j[2:]:
                     message="{} {}" . format(message,w)
-            return self.sendmessage(usernameto,message)
+                return self.sendmessage(usernameto,message)
+
             elif (command=='inbox'):
                 return self.inbox()
-            elif(command=='logout'):
-                
+
+            elif (command == 'logout'):
                 return self.logout()
-            elif(command=='groupchat'):
-                username = j[1].strip()
-                return self.groupmessage(username)
-	    else:
-		return "*Maaf, command tidak benar"
-	except IndexError:
-	    return "-Maaf, command tidak benar"
+
+            elif (command == 'join_group'):
+                group_name = j[1]
+                return self.join_group(group_name)
+
+            elif (command == 'leave_group'):
+                group_token = j[1]
+                return self.leave_group(group_token)
+
+            elif (command == 'create_group'):
+                group_name = j[1]
+                return self.create_group(group_name)
+            else:
+                return "*Maaf, command tidak benar"
+
+        except IndexError:
+            return "-Maaf, command tidak benar"
+
     def sendstring(self,string):
         try:
             self.sock.sendall(string)
@@ -61,21 +65,25 @@ class ChatClient:
                         return json.loads(receivemsg)
         except:
             self.sock.close()
+
     def login(self,username,password):
+        if(self.tokenid!=""):
+            return "Error, authorized already"
         string="auth {} {} \r\n" . format(username,password)
         result = self.sendstring(string)
+
         if result['status']=='OK':
             self.tokenid=result['tokenid']
             return "username {} logged in, token {} " .format(username,self.tokenid)
         else:
             return "Error, {}" . format(result['message'])
-    def logout(self, username):
-        return "username {} logged out" . format(username)
+
     def sendmessage(self,usernameto="xxx",message="xxx"):
         if (self.tokenid==""):
             return "Error, not authorized"
         string="send {} {} {} \r\n" . format(self.tokenid,usernameto,message)
         result = self.sendstring(string)
+
         if result['status']=='OK':
             return "message sent to {}" . format(usernameto)
         else:
@@ -85,33 +93,59 @@ class ChatClient:
             return "Error, not authorized"
         string="inbox {} \r\n" . format(self.tokenid)
         result = self.sendstring(string)
+
         if result['status']=='OK':
             return "{}" . format(json.dumps(result['messages']))
         else:
             return "Error, {}" . format(result['message'])
-    
-    def groupmessage(self,username):
-        if(self.tokenid==""):
+
+    def logout(self):
+        if (self.tokenid==""):
             return "Error, not authorized"
-        while True:
-            msg = input('->')
-            if (msg != ' out'):
-                self.sendgroupchat(msg)
-        while True:
-			try:
-				data = self.sock.recv(1024)
-				if data:
-					print(pickle.loads(data))
-			except:
-				pass
-    def sendgroupchat(self,msg):
-        self.sock.send(pickle.dumps(msg))
+        string = "logout {} \r\n" . format(self.tokenid)
+        result = self.sendstring(string)
 
+        if result['status']=='OK':
+            self.tokenid = ""
+            return "{}" . format(result['message'])
+        else:
+            return "Error, {}" . format(result['message'])
 
+    def create_group(self, group_name):
+        if (self.tokenid==""):
+            return "Error, not authorized"
+        string = "create_group {} {} \r\n" . format(self.tokenid, group_name)
+        result = self.sendstring(string)
+
+        if result['status']=='OK':
+            return "{}" . format(result['messages'])
+        else:
+            return "Error, {}" . format(json.dumps(result['messages']))
+    
+    def join_group(self, group_name):
+        if(self.tokenid==""):
+            return"Error, not authorized"
+        string = "join_group {} {} \r\n" . format(self.tokenid, group_name)
+        result = self.sendstring(string)
+
+        if result['status']=='OK':
+            return "{}" . format(result['message'])
+        else:
+            return "Error, {}" . format(json.dumps(result['message']))
+
+    def leave_group(self, group_name):
+        if(self.tokenid==""):
+            return"Error, not authorized"
+        string = "leave_group {} {} \r\n" . format(self.tokenid, group_name)
+        result = self.sendstring(string)
+
+        if result['status'] == 'OK':
+            return"{}" . format(result['messages'])
+        else:
+            return "Error, {}" . format(json.dumps(result['messages']))
 
 if __name__=="__main__":
     cc = ChatClient()
     while True:
-        cmdline = raw_input("Command {}:" . format(cc.tokenid))
+        cmdline = raw_input("Command: ")
         print cc.proses(cmdline)
-

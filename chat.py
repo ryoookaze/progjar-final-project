@@ -7,6 +7,7 @@ from Queue import *
 class Chat:
 	def __init__(self):
 		self.sessions={}
+		self.groups={}
 		self.users = {}
 		self.users['messi']={ 'nama': 'Lionel Messi', 'negara': 'Argentina', 'password': 'surabaya', 'incoming' : {}, 'outgoing': {}}
 		self.users['henderson']={ 'nama': 'Jordan Henderson', 'negara': 'Inggris', 'password': 'surabaya', 'incoming': {}, 'outgoing': {}}
@@ -34,21 +35,28 @@ class Chat:
                                 username = self.sessions[sessionid]['username']
                                 print "inbox {}" . format(sessionid)
                                 return self.get_inbox(username)
-			elif(command=='logout'):
+			elif (command == 'logout'):
 				sessionid = j[1]
 				username = self.sessions[sessionid]['username']
 				print "{} {}" . format(command, username)
 				return self.logout(sessionid)
-			elif(command=='creategroup'):
+
+			elif (command == 'create_group'):
 				sessionid = j[1]
 				group_name = j[2]
-				print"{} {}" . format(command, group_name)
+				print "{} {}" . format(command, group_name)
 				return self.create_group(group_name, sessionid)
-			elif(command=='joingroup'):
+
+			elif (command == 'join_group'):
 				sessionid = j[1]
 				group_token = j[2]
-				print"{} {}" . format(command, group_token)
+				print "{} {}" . format(command, group_token)
 				return self.join_group(group_token, sessionid)
+			elif(command == 'leave_group'):
+				sessionid = j[1]
+				group_name = j[2]
+				print "{} {}" . format(command, group_name)
+				return self.leave_group(group_name, sessionid)
 			else:
 				return {'status': 'ERROR', 'message': '**Protocol Tidak Benar'}
 		except IndexError:
@@ -102,38 +110,43 @@ class Chat:
 	def logout(self, tokenid):
 		self.sessions[tokenid]=None
 		return { 'status': 'OK', 'message': 'Logout succeed' }
+
 	def create_group(self, group_name, sessionid):
 		while(True):
-			group_token = str(uuid.uuid4())[:5]
-			if group_token not in self.groups:
+			#group_token = str(uuid.uuid4())[:5]
+			groupname = str(group_name)
+			#if group_token not in self.groups:
+				#break
+			if groupname not in self.groups:
 				break
 		admin_name = self.sessions[sessionid]['username']
-		self.groups[group_token] = {'group_name':group_name, 'group_token':group_token, 'admin':admin_name, 'incoming':[], 'users':[]}
-		self.groups[group_token]['users'].append(admin_name)
-		return {'status':'OK', 'messages': self.groups[group_token]}
+		self.groups[groupname] = {'group_name':group_name,'users':[]}
+		self.groups[groupname]['users'].append(admin_name)
+		return {'status':'OK', 'messages': self.groups[groupname]}
+
 	def join_group(self, group_token, sessionid):
 		username = self.sessions[sessionid]['username']
 		if(group_token not in self.groups):
 			return {'status':'Err', 'message':'404 Group not found'}
+
 		if username not in self.groups[group_token]['users']:
 			self.groups[group_token]['users'].append(username)
 			return {'status':'OK', 'message':'Group joined successfully'}
+
 		return {'status':'Err', 'message':'You already joined group'}
 
-if __name__=="__main__":
-	j = Chat()
-        sesi = j.proses("auth messi surabaya")
-	print sesi
-	sesi = j.autentikasi_user('messi','surabaya')
-	#print sesi
-	tokenid = sesi['tokenid']
-	print j.proses("send {} henderson hello gimana kabarnya son " . format(tokenid))
-	print j.send_message(tokenid,'messi','henderson','hello son')
-	print j.send_message(tokenid,'henderson','messi','hello si')
-	print j.send_message(tokenid,'lineker','messi','hello si dari lineker')
+	def leave_group(self, group_name, sessionid):
+		username = self.sessions[sessionid]['username']
+		if(group_name not in self.groups):
+			return {'status':'Err', 'message':'404 Group not found'}
+		if username not in self.groups[group_name]['users']:
+			self.groups[group_name]['users'].append(username)
+			return {'status':'OK', 'message':'Left the group'}
+
+		return {'status':'Err', 'message':'You not joining the group'}
+		
 
 
-	print j.get_inbox('messi')
 
 
 
