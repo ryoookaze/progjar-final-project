@@ -52,18 +52,11 @@ class Chat:
 				group_token = j[2]
 				print "{} {}" . format(command, group_token)
 				return self.join_group(group_token, sessionid)
-
 			elif(command == 'leave_group'):
 				sessionid = j[1]
 				group_name = j[2]
 				print "{} {}" . format(command, group_name)
 				return self.leave_group(group_name, sessionid)
-
-			elif(command == 'sendmsg_group'):
-				sessionid = j[1]
-				group_name = j[2]
-				print "{} {}" . format(command, group_name)
-				return self.sendmsg_group(group_name, sessionid)
 			else:
 				return {'status': 'ERROR', 'message': '**Protocol Tidak Benar'}
 		except IndexError:
@@ -121,31 +114,27 @@ class Chat:
 	def create_group(self, group_name, sessionid):
 		while(True):
 			#group_token = str(uuid.uuid4())[:5]
-			#groupname = str(group_name)
+			groupname = str(group_name)
 			#if group_token not in self.groups:
 				#break
-			if group_name not in self.groups:
-				break
+			if groupname in self.groups:
+				return {'status': "ERROR", 'messages':'group sudah ada'}
 		admin_name = self.sessions[sessionid]['username']
-		self.groups[group_name] = {'group_name':group_name,'users':[]}
-		self.groups[group_name]['users'].append(admin_name)
-		return {'status':'OK', 'messages': self.groups[group_name]}
+		self.groups[groupname] = {'group_name':group_name,'users':[]}
+		self.groups[groupname]['users'].append(admin_name)
+		return {'status':'OK', 'messages': self.groups[groupname]}
 
-	def join_group(self, group_name, sessionid):
+	def join_group(self, group_token, sessionid):
 		username = self.sessions[sessionid]['username']
-		if(group_name not in self.groups):
+		if(group_token not in self.groups):
 			return {'status':'Err', 'message':'404 Group not found'}
 
-		if username not in self.groups[group_name]['users']:
-			self.groups[group_name]['users'].append(username)
+		if username not in self.groups[group_token]['users']:
+			self.groups[group_token]['users'].remove(username)
 			return {'status':'OK', 'message':'Group joined successfully'}
 
 		return {'status':'Err', 'message':'You already joined group'}
-	
-	def sendmsg_group(self, group_name, sessionid, message):
-		if group_name not in self.groups:
-			return {'message': 'No group exist'}
-		
+
 	def leave_group(self, group_name, sessionid):
 		username = self.sessions[sessionid]['username']
 		if(group_name not in self.groups):

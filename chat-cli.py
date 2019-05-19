@@ -2,6 +2,7 @@ import socket
 import os
 import json
 import datetime
+import sys
 
 TARGET_IP = "127.0.0.1"
 TARGET_PORT = 8889
@@ -44,11 +45,12 @@ class ChatClient:
                 group_token = j[1]
                 return self.leave_group(group_token)
 
+            elif(command == 'quit'):
+                sys.exit()
+
             elif (command == 'create_group'):
                 group_name = j[1]
                 return self.create_group(group_name)
-            
-            
             else:
                 return "*Maaf, command tidak benar"
 
@@ -136,15 +138,14 @@ class ChatClient:
             return "Error, {}" . format(json.dumps(result['message']))
 
     def leave_group(self, group_name):
-        if(self.tokenid==""):
-            return"Error, not authorized"
-        string = "leave_group {} {} \r\n" . format(self.tokenid, group_name)
+        if (self.tokenid==""):
+            return "Error, not authorized"
+        string="leave_group {} {} \r\n" .format(group_name, self.tokenid)
         result = self.sendstring(string)
-
-        if result['status'] == 'OK':
-            return"{}" . format(result['messages'])
+        if result['status']=='OK':
+            return "{}" . format(json.dumps(result['message']))
         else:
-            return "Error, {}" . format(json.dumps(result['messages']))
+            return "Error, {}" . format(result['message'])
 
 if __name__=="__main__":
     cc = ChatClient()
