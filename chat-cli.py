@@ -47,6 +47,8 @@ class ChatClient:
             elif (command == 'create_group'):
                 group_name = j[1]
                 return self.create_group(group_name)
+            
+            
             else:
                 return "*Maaf, command tidak benar"
 

@@ -121,23 +121,23 @@ class Chat:
 	def create_group(self, group_name, sessionid):
 		while(True):
 			#group_token = str(uuid.uuid4())[:5]
-			groupname = str(group_name)
+			#groupname = str(group_name)
 			#if group_token not in self.groups:
 				#break
-			if groupname not in self.groups:
+			if group_name not in self.groups:
 				break
 		admin_name = self.sessions[sessionid]['username']
-		self.groups[groupname] = {'group_name':group_name,'users':[]}
-		self.groups[groupname]['users'].append(admin_name)
-		return {'status':'OK', 'messages': self.groups[groupname]}
+		self.groups[group_name] = {'group_name':group_name,'users':[]}
+		self.groups[group_name]['users'].append(admin_name)
+		return {'status':'OK', 'messages': self.groups[group_name]}
 
-	def join_group(self, group_token, sessionid):
+	def join_group(self, group_name, sessionid):
 		username = self.sessions[sessionid]['username']
-		if(group_token not in self.groups):
+		if(group_name not in self.groups):
 			return {'status':'Err', 'message':'404 Group not found'}
 
-		if username not in self.groups[group_token]['users']:
-			self.groups[group_token]['users'].append(username)
+		if username not in self.groups[group_name]['users']:
+			self.groups[group_name]['users'].append(username)
 			return {'status':'OK', 'message':'Group joined successfully'}
 
 		return {'status':'Err', 'message':'You already joined group'}
