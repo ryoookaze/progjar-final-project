@@ -42,8 +42,13 @@ class Chat:
 			elif(command=='creategroup'):
 				sessionid = j[1]
 				group_name = j[2]
-				print"{} {}" . format(command, username)
-				return self.creategroup(group_name, sessionid)
+				print"{} {}" . format(command, group_name)
+				return self.create_group(group_name, sessionid)
+			elif(command=='joingroup'):
+				sessionid = j[1]
+				group_token = j[2]
+				print"{} {}" . format(command, group_token)
+				return self.join_group(group_token, sessionid)
 			else:
 				return {'status': 'ERROR', 'message': '**Protocol Tidak Benar'}
 		except IndexError:
@@ -94,9 +99,26 @@ class Chat:
 				msgs[users].append(s_fr['incoming'][users].get_nowait())
 			
 		return {'status': 'OK', 'messages': msgs}
-	def logout(self,sessionid,username):
-		self.sessions['sessionid'] = None
-		return "Logout Success"
+	def logout(self, tokenid):
+		self.sessions[tokenid]=None
+		return { 'status': 'OK', 'message': 'Logout succeed' }
+	def create_group(self, group_name, sessionid):
+		while(True):
+			group_token = str(uuid.uuid4())[:5]
+			if group_token not in self.groups:
+				break
+		admin_name = self.sessions[sessionid]['username']
+		self.groups[group_token] = {'group_name':group_name, 'group_token':group_token, 'admin':admin_name, 'incoming':[], 'users':[]}
+		self.groups[group_token]['users'].append(admin_name)
+		return {'status':'OK', 'messages': self.groups[group_token]}
+	def join_group(self, group_token, sessionid):
+		username = self.sessions[sessionid]['username']
+		if(group_token not in self.groups):
+			return {'status':'Err', 'message':'404 Group not found'}
+		if username not in self.groups[group_token]['users']:
+			self.groups[group_token]['users'].append(username)
+			return {'status':'OK', 'message':'Group joined successfully'}
+		return {'status':'Err', 'message':'You already joined group'}
 
 if __name__=="__main__":
 	j = Chat()

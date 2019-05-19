@@ -9,6 +9,7 @@ from chat import Chat
 
 chatserver = Chat()
 
+global proses
 class ProcessTheClient(threading.Thread):
 	def __init__(self,connection,address):
 		self.connection = connection
@@ -30,7 +31,7 @@ class Server(threading.Thread):
 		self.the_clients = []
 		self.my_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		threading.Thread.__init__(self)
-		
+
 	def run(self):
 		self.my_socket.bind(('0.0.0.0',8889))
 		self.my_socket.listen(1)

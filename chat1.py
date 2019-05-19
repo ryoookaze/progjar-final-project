@@ -38,7 +38,7 @@ class ChatClient:
                     return self.logout()
                 elif(command=='creategroup'):
                     groupname = j[1]
-                    return self.creategroup()
+                    return self.creategroup(groupname)
                 elif(command=='joingroup'):
                     grouptoken = j[1]
                     return self.joingroup()
@@ -75,7 +75,7 @@ class ChatClient:
             return "username {} logged in, token {} " .format(username,self.tokenid)
         else:
             return "Error, {}" . format(result['message'])
-    def logout(self, username):
+    def logout(self):
         if(self.tokenid==""):
             return"Error, not authorized"
         string = "logout {} \r\n" . format(self.tokenid)
@@ -103,7 +103,24 @@ class ChatClient:
             return "{}" . format(json.dumps(result['messages']))
         else:
             return "Error, {}" . format(result['message'])
-
+    def creategroup(self, groupname):
+        if (self.tokenid==""):
+            return"Error, not authorized"
+        string="creategroup {} \r\n" . format(self.tokenid, groupname)
+        result = self.sendstring(string)
+        if result['status']=='OK':
+            return "{}" . format(json.dumps(result['messages']))
+        else:
+            return "Error, {}" . format(result['message'])
+    def joingroup(self, grouptoken):
+        if (self.tokenid==""):
+            return"Error, not authorized"
+        string="joingroup {} \r\n" . format(self.tokenid, grouptoken)
+        result = self.sendstring(string)
+        if result['status']=='OK':
+            return "{}" . format(json.dumps(result['messages']))
+        else:
+            return "Error, {}" . format(result['message'])
 if __name__=="__main__":
     cc = ChatClient()
     while True:
