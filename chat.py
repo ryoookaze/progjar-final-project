@@ -14,6 +14,10 @@ class Chat:
 		self.users['messi']={ 'nama': 'Lionel Messi', 'negara': 'Argentina', 'password': 'sby', 'incoming' : {}, 'outgoing': {}}
 		self.users['henderson']={ 'nama': 'Jordan Henderson', 'negara': 'Inggris', 'password': 'sby', 'incoming': {}, 'outgoing': {}}
 		self.users['lineker']={ 'nama': 'Gary Lineker', 'negara': 'Inggris', 'password': 'sby','incoming': {}, 'outgoing':{}}
+		self.users['marde']={ 'nama': 'Marde Fasma', 'negara': 'Jowo', 'password': '123','incoming': {}, 'outgoing':{}}
+		self.users['ical']={ 'nama': 'Faizal Khilmi', 'negara': 'Tetew', 'password': 'sby','incoming': {}, 'outgoing':{}}
+		self.users['haz']={ 'nama': 'M. Hazdi Kurniawan', 'negara': 'Arab', 'password': 'sby','incoming': {}, 'outgoing':{}}
+		self.groups['test']={'group_name':'Testing', 'group_token':'test', 'admin':'marde', 'incoming':[], 'users':['marde','ical','haz']}
 
 	def proses(self, data, connection):
 		j=data.strip().split(" ")
@@ -57,7 +61,7 @@ class Chat:
 			elif (command == 'join_group'):
 				sessionid = j[1]
 				group_token = j[2]
-				print "{} {}" . format(command, group_name)
+				print "{} {}" . format(command, group_token)
 				return self.join_group(group_token, sessionid)
 
 			elif (command == 'leave_group'):
@@ -125,7 +129,6 @@ class Chat:
 			inqueue_receiver[username_from].put(message)
 		return {'status': 'OK', 'message': 'Message Sent'}
 
-
 	def get_inbox(self,username):
 		s_fr = self.get_user(username)
 		incoming = s_fr['incoming']
@@ -141,18 +144,7 @@ class Chat:
 		self.sessions[tokenid]=None
 		return { 'status': 'OK', 'message': 'Logout succeed' }
 
-	def create_group(self, group_name, sessionid):
-		while(True):
-			group_token = str(uuid.uuid4())[:5]
-			#s = str(group_name)
-			if group_token not in self.groups:
-				break
-		admin_name = self.sessions[sessionid]['username']
-		self.groups[group_token] = {'group_name':group_name, 'group_token':group_token, 'admin':admin_name, 'incoming':[], 'users':[]}
-		self.groups[group_token]['users'].append(admin_name)
-		return {'status':'OK', 'messages': self.groups[group_token]}
-
-	def join_group(self, group_name, group_token, sessionid):
+	def join_group(self, group_token, sessionid):
 		username = self.sessions[sessionid]['username']
 		if(group_token not in self.groups):
 			return {'status':'Err', 'message':'404 Group not found'}
@@ -189,4 +181,14 @@ class Chat:
 			return {'status':'OK', 'message':'Something happened'}
 
 		return {'status':'OK', 'message':'Message sent'}
+
+	def create_group(self, group_name, sessionid):
+		while(True):
+			group_token = str(uuid.uuid4())[:5]
+			if group_token not in self.groups:
+				break
+		admin_name = self.sessions[sessionid]['username']
+		self.groups[group_token] = {'group_name':group_name, 'group_token':group_token, 'admin':admin_name, 'incoming':[], 'users':[]}
+		self.groups[group_token]['users'].append(admin_name)
+		return {'status':'OK', 'messages': self.groups[group_token]}
 

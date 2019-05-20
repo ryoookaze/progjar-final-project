@@ -151,10 +151,10 @@ class ChatClient:
         else:
             return "Error, {}" . format(json.dumps(result['messages']))
 
-    def join_group(self, group_name):
+    def join_group(self, group_token):
         if (self.tokenid==""):
             return "Error, not authorized"
-        string = "join_group {} {} \r\n" . format(self.tokenid, group_name)
+        string = "join_group {} {} \r\n" . format(self.tokenid, group_token)
         result = self.sendstring(string)
 
         if result['status']=='OK':
