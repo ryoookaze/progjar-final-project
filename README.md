@@ -1,7 +1,7 @@
 # Pemrograman Jaringan
 Final Project Pemrograman Jaringan
 
-## User
+## User Input
 **Log In**
 `
     auth [username][password]
