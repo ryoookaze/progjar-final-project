@@ -2,7 +2,6 @@ import socket
 import os
 import json
 import datetime
-import sys
 
 TARGET_IP = "127.0.0.1"
 TARGET_PORT = 8889
@@ -38,19 +37,44 @@ class ChatClient:
                 return self.logout()
 
             elif (command == 'join_group'):
-                group_name = j[1]
-                return self.join_group(group_name)
+                group_token = j[1]
+                return self.join_group(group_token)
 
             elif (command == 'leave_group'):
                 group_token = j[1]
                 return self.leave_group(group_token)
 
-            elif(command == 'quit'):
-                sys.exit()
-
             elif (command == 'create_group'):
                 group_name = j[1]
                 return self.create_group(group_name)
+
+            elif (command == 'inbox_group'):
+                group_name = j[1]
+                return self.inbox_group(group_name)
+
+            elif (command == 'list_group'):
+                group_name = j[1]
+                return self.list_group(group_name)
+
+            elif (command == 'send_group'):
+                group_token = j[1]
+                message=""
+                for w in j[2:]:
+                    message="{} {}" . format(message, w)
+                return self.send_group(group_token, message)
+
+            elif (command == 'send_file'):
+                usernameto = j[1]
+                filename = j[2]
+                return self.send_file(usernameto, filename)
+
+            elif (command == 'download_file'):
+                filename = j[1]
+                return self.download_file(filename)
+
+            elif (command == 'ls'):
+                return self.ls()
+
             else:
                 return "*Maaf, command tidak benar"
 
@@ -92,6 +116,7 @@ class ChatClient:
             return "message sent to {}" . format(usernameto)
         else:
             return "Error, {}" . format(result['message'])
+
     def inbox(self):
         if (self.tokenid==""):
             return "Error, not authorized"
@@ -125,25 +150,48 @@ class ChatClient:
             return "{}" . format(result['messages'])
         else:
             return "Error, {}" . format(json.dumps(result['messages']))
-    
+
     def join_group(self, group_name):
-        if(self.tokenid==""):
-            return"Error, not authorized"
+        if (self.tokenid==""):
+            return "Error, not authorized"
         string = "join_group {} {} \r\n" . format(self.tokenid, group_name)
         result = self.sendstring(string)
 
         if result['status']=='OK':
             return "{}" . format(result['message'])
         else:
-            return "Error, {}" . format(json.dumps(result['message']))
+            return "Error, {}" . format(result['message'])
 
-    def leave_group(self, group_name):
+    def leave_group(self, group_token):
         if (self.tokenid==""):
             return "Error, not authorized"
-        string="leave_group {} {} \r\n" .format(group_name, self.tokenid)
+        string = "leave_group {} {} \r\n" . format(self.tokenid, group_token)
         result = self.sendstring(string)
+
         if result['status']=='OK':
-            return "{}" . format(json.dumps(result['message']))
+            return "{}" . format(result['message'])
+        else:
+            return "Error, {}" . format(result['message'])
+
+    def inbox_group(self, group_token):
+        if (self.tokenid==""):
+            return "Error, not authorized"
+        string = "inbox_group {} {} \r\n" . format(self.tokenid, group_token)
+        result = self.sendstring(string)
+
+        if result['status']=='OK':
+            return "{}" . format(json.dumps(result['messages']))
+        else:
+            return "Error, {}" . format(result['message'])
+
+    def send_group(self, group_token, message):
+        if (self.tokenid==""):
+            return "Error, not authorized"
+        string = "send_group {} {} {} \r\n" . format(self.tokenid, group_token, message)
+        result = self.sendstring(string)
+
+        if result['status']=='OK':
+            return "{}" . format(result['message'])
         else:
             return "Error, {}" . format(result['message'])
 

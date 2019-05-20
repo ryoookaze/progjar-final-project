@@ -19,7 +19,9 @@ class ProcessTheClient(threading.Thread):
 		while True:
 			data = self.connection.recv(1024)
 			if data:
-				self.connection.sendall("{}\r\n\r\n" . format(json.dumps(chatserver.proses(data))))
+				sendstring = chatserver.proses(data, self.connection)
+				if sendstring:
+					self.connection.sendall("{}\r\n\r\n" . format(json.dumps(sendstring)))
 			else:
 				break
 		self.connection.close()
@@ -36,11 +38,11 @@ class Server(threading.Thread):
 		while True:
 			self.connection, self.client_address = self.my_socket.accept()
 			print >> sys.stderr, 'connection from', self.client_address
-			
+
 			clt = ProcessTheClient(self.connection, self.client_address)
 			clt.start()
 			self.the_clients.append(clt)
-	
+
 
 def main():
 	svr = Server()
@@ -48,4 +50,3 @@ def main():
 
 if __name__=="__main__":
 	main()
-
