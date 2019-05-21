@@ -25,9 +25,9 @@ Final Project Pemrograman Jaringan
 `  
 **Join Group**
 `
-    join_group [grouptoken]
+    join_group [groupname]
 `  
 **Leave Group**
 `
-    leave_group [grouptoken]
+    leave_group [groupname]
 `  
