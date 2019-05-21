@@ -60,9 +60,9 @@ class Chat:
 
 			elif (command == 'join_group'):
 				sessionid = j[1]
-				group_token = j[2]
-				print "{} {}" . format(command, group_token)
-				return self.join_group(group_token, sessionid)
+				group_name = j[2]
+				print "{} {}" . format(command, group_name)
+				return self.join_group(group_name, sessionid)
 
 			elif (command == 'leave_group'):
 				sessionid = j[1]
@@ -72,18 +72,18 @@ class Chat:
 
 			elif (command == 'send_group'):
 				sessionid = j[1]
-				group_token = j[2]
+				group_name = j[2]
 				message = ""
 				for w in j[3:]:
 					message="{} {}" . format(message,w)
-				print "{} {} {}" . format(command, group_token, message)
-				return self.send_group(group_token, sessionid, message)
+				print "{} {} {}" . format(command, group_name, message)
+				return self.send_group(group_name, sessionid, message)
 
-			elif (command == 'inbox_group'):
+			elif (command == 'get_inbox_group'):
 				sessionid = j[1]
-				group_token = j[2]
-				print "{} {}" . format(command, group_token)
-				return self.inbox_group(group_token, sessionid)
+				group_name = j[2]
+				print "{} {}" . format(command, group_name)
+				return self.get_inbox_group(group_name, sessionid)
 
 			else:
 				return {'status': 'ERROR', 'message': '**Protocol Tidak Benar'}
@@ -144,13 +144,13 @@ class Chat:
 		self.sessions[tokenid]=None
 		return { 'status': 'OK', 'message': 'Logout succeed' }
 
-	def join_group(self, group_token, sessionid):
+	def join_group(self, group_name, sessionid):
 		username = self.sessions[sessionid]['username']
-		if(group_token not in self.groups):
+		if(group_name not in self.groups):
 			return {'status':'Err', 'message':'404 Group not found'}
 
-		if username not in self.groups[group_token]['users']:
-			self.groups[group_token]['users'].append(username)
+		if username not in self.groups[group_name]['users']:
+			self.groups[group_name]['users'].append(username)
 			return {'status':'OK', 'message':'Group joined successfully'}
 
 		return {'status':'Err', 'message':'You already joined group'}
@@ -166,17 +166,17 @@ class Chat:
 
 		return {'status':'Err', 'message':'You are not the part of the group'}
 
-	def send_group(self, group_token, sessionid, message):
-		if(group_token not in self.groups):
+	def send_group(self, group_name, sessionid, message):
+		if(group_name not in self.groups):
 			return {'status':'Err', 'message':'404 Group not found'}
 
 		username = self.sessions[sessionid]['username']
-		if username not in self.groups[group_token]['users']:
+		if username not in self.groups[group_name]['users']:
 			return {'status':'Err', 'message':'You are not group member'}
 
 		now = datetime.datetime.now()
 		try:
-			self.groups[group_token]['incoming'].append({'from':username, 'message':message, 'created_at':now.strftime("%H:%M")})
+			self.groups[group_name]['incoming'].append({'from':username, 'message':message, 'created_at':now.strftime("%H:%M")})
 		except:
 			return {'status':'OK', 'message':'Something happened'}
 
@@ -184,20 +184,21 @@ class Chat:
 
 	def create_group(self, group_name, sessionid):
 		while(True):
-			group_token = str(uuid.uuid4())[:5]
-			if group_token not in self.groups:
+			#group_token = str(uuid.uuid4())[:5]
+			s = str(group_name)
+			if s not in self.groups:
 				break
 		admin_name = self.sessions[sessionid]['username']
-		self.groups[group_token] = {'group_name':group_name, 'group_token':group_token, 'admin':admin_name, 'incoming':[], 'users':[]}
-		self.groups[group_token]['users'].append(admin_name)
-		return {'status':'OK', 'messages': self.groups[group_token]}
+		self.groups[s] = {'group_name':group_name, 'admin':admin_name, 'incoming':[], 'users':[]}
+		self.groups[s]['users'].append(admin_name)
+		return {'status':'OK', 'messages': self.groups[s]}
 
 	def get_group(self,group_name):
-		if (groupname not in self.groups):
+		if (group_name not in self.groups):
 			return False
-		return self.groups[groupname]
+		return self.groups[group_name]
 
-	def get_inbox_group(self, group_name):
+	def get_inbox_group(self, group_name, sessionid):
 		s_fr = self.get_group(group_name)
 		incoming = s_fr['incoming']
 		msgs = {}
@@ -206,4 +207,4 @@ class Chat:
 			while not incoming[groups].empty():
 				msgs[groups].append(s_fr['incoming'][groups].get_nowait())
 
-		return {'status': 'OK', 'messages': msgs}
+		return {'status': 'OK', 'message': msgs}

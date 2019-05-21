@@ -2,9 +2,10 @@ import socket
 import os
 import json
 import datetime
+import sys
 
 TARGET_IP = "127.0.0.1"
-TARGET_PORT = 8889
+TARGET_PORT = 8886
 
 class ChatClient:
     def __init__(self):
@@ -30,6 +31,9 @@ class ChatClient:
                     message="{} {}" . format(message,w)
                 return self.sendmessage(usernameto,message)
 
+            elif (command == 'out'):
+                sys.exit()
+
             elif (command=='inbox'):
                 return self.inbox()
 
@@ -37,8 +41,8 @@ class ChatClient:
                 return self.logout()
 
             elif (command == 'join_group'):
-                group_token = j[1]
-                return self.join_group(group_token)
+                group_name = j[1]
+                return self.join_group(group_name)
 
             elif (command == 'leave_group'):
                 group_token = j[1]
@@ -49,31 +53,19 @@ class ChatClient:
                 return self.create_group(group_name)
 
             elif (command == 'inbox_group'):
-                group_name = j[1]
-                return self.inbox_group(group_name)
-
-            elif (command == 'list_group'):
-                group_name = j[1]
-                return self.list_group(group_name)
+                group_token = j[1]
+                return self.inbox_group(group_token)
 
             elif (command == 'send_group'):
-                group_token = j[1]
+                group_name = j[1]
                 message=""
                 for w in j[2:]:
                     message="{} {}" . format(message, w)
-                return self.send_group(group_token, message)
-
-            elif (command == 'send_file'):
-                usernameto = j[1]
-                filename = j[2]
-                return self.send_file(usernameto, filename)
-
-            elif (command == 'download_file'):
-                filename = j[1]
-                return self.download_file(filename)
-
-            elif (command == 'ls'):
-                return self.ls()
+                return self.send_group(group_name, message)
+            
+            elif (command == 'get_inbox_group'):
+                group_name = j[1]
+                return self.get_inbox_group(group_name)
 
             else:
                 return "*Maaf, command tidak benar"
@@ -184,16 +176,28 @@ class ChatClient:
         else:
             return "Error, {}" . format(result['message'])
 
-    def send_group(self, group_token, message):
+    def send_group(self, group_name, message):
         if (self.tokenid==""):
             return "Error, not authorized"
-        string = "send_group {} {} {} \r\n" . format(self.tokenid, group_token, message)
+        string = "send_group {} {} {} \r\n" . format(self.tokenid, group_name, message)
         result = self.sendstring(string)
 
         if result['status']=='OK':
             return "{}" . format(result['message'])
         else:
             return "Error, {}" . format(result['message'])
+
+    def get_inbox_group(self, group_name):
+        if (self.tokenid==""):
+            return "Error, not authorized"
+        string = "get_inbox_group {} {} \r\n" . format(self.tokenid, group_name)
+        result = self.sendstring(string)
+
+        if result['status']=='OK':
+            return "{}" . format(result['message'])
+        else:
+            return "Error, {}" . format(result['message'])
+
 
 if __name__=="__main__":
     cc = ChatClient()
