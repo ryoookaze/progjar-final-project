@@ -12,6 +12,7 @@ class Server():
 		self.sock.bind((str(host), int(port)))
 		self.sock.listen(10)
 		self.sock.setblocking(False)
+		threading.Thread(__init__)
 
 		aceptar = threading.Thread(target=self.aceptarCon)
 		procesar = threading.Thread(target=self.procesarCon)
