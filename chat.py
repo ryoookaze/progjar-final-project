@@ -192,3 +192,18 @@ class Chat:
 		self.groups[group_token]['users'].append(admin_name)
 		return {'status':'OK', 'messages': self.groups[group_token]}
 
+	def get_group(self,group_name):
+		if (groupname not in self.groups):
+			return False
+		return self.groups[groupname]
+
+	def get_inbox_group(self, group_name):
+		s_fr = self.get_group(group_name)
+		incoming = s_fr['incoming']
+		msgs = {}
+		for groups in incoming:
+			msgs[groups] = []
+			while not incoming[groups].empty():
+				msgs[groups].append(s_fr['incoming'][groups].get_nowait())
+
+		return {'status': 'OK', 'messages': msgs}
