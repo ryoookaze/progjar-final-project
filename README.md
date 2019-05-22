@@ -14,16 +14,13 @@ Final Project Pemrograman Jaringan
 `
     send [usernameto][messages]
 `  
-**Send Files**
-`
-`
 
 ## Group
-**Create Group**
+**Create Group** 
 `
     create_group [groupname]
 `  
-**Join Group**
+**Join Group** 
 `
     join_group [groupname]
 `  
