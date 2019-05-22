@@ -109,14 +109,19 @@ class HttpServer:
 
     
     def http_get(self,object_address):
-        files = glob('./*')
-        loca='.'
-        if loca+object_address not in files:
+        files = glob('.\*')
+        thedir='.'
+        # files=files.replace("/","\\") 
+        files = [item.replace("\\\\", "\\") for item in files]
+        object_address=object_address.replace("/","\\")
+        print "files : "+ str(files)
+        print "obj add : "+ str(object_address)
+        if thedir+object_address not in files:
             return self.response(404,'Not Found','',{})
-        fp = open(loca+object_address,'r')
+        fp = open(thedir+object_address,'r')
         isi = fp.read()
         
-        fext = os.path.splitext(loca+object_address)[1]
+        fext = os.path.splitext(thedir+object_address)[1]
         content_type = self.types[fext]
         
         headers={}
@@ -124,8 +129,9 @@ class HttpServer:
         
         return self.response(200,'OK',isi,headers)
     
-    def http_post(self, obj):
-        print "content posted : "+ obj
+    def http_post(self, something):
+        print "POSTs : "+ something
+        return something
         
                 
 #>>> import os.path
