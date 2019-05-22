@@ -83,7 +83,7 @@ class Chat:
 				sessionid = j[1]
 				group_name = j[2]
 				print "{} {}" . format(command, group_name)
-				return self.get_inbox_group(group_name, sessionid)
+				return self.get_inbox_group(group_name)
 
 			else:
 				return {'status': 'ERROR', 'message': '**Protocol Tidak Benar'}
@@ -198,13 +198,13 @@ class Chat:
 			return False
 		return self.groups[group_name]
 
-	def get_inbox_group(self, group_name, sessionid):
+	def get_inbox_group(self, group_name):
 		s_fr = self.get_group(group_name)
 		incoming = s_fr['incoming']
+		print incoming
 		msgs = {}
-		for groups in incoming:
+		for groups in range(len(incoming)):
 			msgs[groups] = []
-			while not incoming[groups].empty():
-				msgs[groups].append(s_fr['incoming'][groups].get_nowait())
+			msgs[groups].append(s_fr['incoming'][groups])
 
 		return {'status': 'OK', 'message': msgs}

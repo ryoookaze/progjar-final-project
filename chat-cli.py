@@ -63,9 +63,9 @@ class ChatClient:
                     message="{} {}" . format(message, w)
                 return self.send_group(group_name, message)
             
-            elif (command == 'get_inbox_group'):
-                group_name = j[1]
-                return self.get_inbox_group(group_name)
+            # elif (command == 'get_inbox_group'):
+            #     group_name = j[1]
+            #     return self.get_inbox_group(group_name)
 
             else:
                 return "*Maaf, command tidak benar"
@@ -168,11 +168,13 @@ class ChatClient:
     def inbox_group(self, group_token):
         if (self.tokenid==""):
             return "Error, not authorized"
-        string = "inbox_group {} {} \r\n" . format(self.tokenid, group_token)
+        string = "get_inbox_group {} {} \r\n" . format(self.tokenid, group_token)
         result = self.sendstring(string)
 
         if result['status']=='OK':
-            return "{}" . format(json.dumps(result['messages']))
+            # return "{}" . format(json.dumps(result['messages']))
+            for key in sorted(result['message'].keys()):
+                print result['message'][key]
         else:
             return "Error, {}" . format(result['message'])
 
@@ -187,16 +189,6 @@ class ChatClient:
         else:
             return "Error, {}" . format(result['message'])
 
-    def get_inbox_group(self, group_name):
-        if (self.tokenid==""):
-            return "Error, not authorized"
-        string = "get_inbox_group {} {} \r\n" . format(self.tokenid, group_name)
-        result = self.sendstring(string)
-
-        if result['status']=='OK':
-            return "{}" . format(result['message'])
-        else:
-            return "Error, {}" . format(result['message'])
 
 
 if __name__=="__main__":

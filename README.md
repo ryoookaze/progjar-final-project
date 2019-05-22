@@ -27,7 +27,16 @@ Final Project Pemrograman Jaringan
 `
     join_group [groupname]
 `  
-**Leave Group**
+**Leave Group**  
 `
     leave_group [groupname]
 `  
+**Send Group**  
+`
+    send_group [groupname][message]
+`  
+**Check group message**  
+`
+    inbox_group [groupname]
+`
+
