@@ -16,11 +16,11 @@ Final Project Pemrograman Jaringan
 `  
 
 ## Group
-**Create Group** 
+**Create Group**  
 `
     create_group [groupname]
 `  
-**Join Group** 
+**Join Group**  
 `
     join_group [groupname]
 `  
