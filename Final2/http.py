@@ -78,6 +78,8 @@ class HttpServer:
     def http_head(self,object_address):
         files = glob('./*')
         loca='.'
+        files = [item.replace("\\\\", "\\") for item in files]
+        object_address=object_address.replace("/","\\")
         if loca+object_address not in files:
             return self.response(404,'Not Found','',{})
         fp = open(loca+object_address,'r')
@@ -114,8 +116,8 @@ class HttpServer:
         # files=files.replace("/","\\") 
         files = [item.replace("\\\\", "\\") for item in files]
         object_address=object_address.replace("/","\\")
-        print "files : "+ str(files)
-        print "obj add : "+ str(object_address)
+        # print "files : "+ str(files)
+        # print "obj add : "+ str(object_address)
         if thedir+object_address not in files:
             return self.response(404,'Not Found','',{})
         fp = open(thedir+object_address,'r')
